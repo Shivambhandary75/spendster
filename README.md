@@ -45,4 +45,4 @@ Open http://localhost:3000 in your browser.
 
 ## Live Demo
 
-<your-vercel-url>
+[Spendster](https://spendster.vercel.app)
