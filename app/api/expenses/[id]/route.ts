@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/lib/auth";
 import connectDB from "@/app/lib/mongodb";
 import Expense from "@/app/models/Expense";
 
@@ -7,6 +9,14 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await getServerSession(authOptions);
+
+if (!session?.user?.email) {
+  return NextResponse.json(
+    { error: "Unauthorized" },
+    { status: 401 }
+  );
+}
     await connectDB();
 
     const { id } = await params;
@@ -44,11 +54,14 @@ if (
   )
 }
 
-    const expense = await Expense.findByIdAndUpdate(
-      id,
-      { title, amount, category },
-      { new: true }
-    );
+   const expense = await Expense.findOneAndUpdate(
+  {
+    _id: id,
+    userId: session.user.email,
+  },
+  { title, amount, category },
+  { new: true }
+);
 
     if (!expense) {
       return NextResponse.json(
@@ -71,11 +84,22 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await getServerSession(authOptions);
+
+if (!session?.user?.email) {
+  return NextResponse.json(
+    { error: "Unauthorized" },
+    { status: 401 }
+  );
+}
     await connectDB();
 
     const { id } = await params;
 
-    const expense = await Expense.findByIdAndDelete(id);
+    const expense = await Expense.findOneAndDelete({
+  _id: id,
+  userId: session.user.email,
+});
 
     if (!expense) {
       return NextResponse.json(

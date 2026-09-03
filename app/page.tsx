@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
+import { useSession, signOut } from "next-auth/react"
 
 type Expense = {
   _id: string
@@ -11,6 +12,7 @@ type Expense = {
 }
 
 export default function Home() {
+  const { data: session } = useSession()
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [title, setTitle] = useState("")
   const [amount, setAmount] = useState("")
@@ -149,14 +151,29 @@ export default function Home() {
     <div className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
 
       <header className="mb-10 border-b border-black pb-6">
-        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-          spendster
-        </h1>
+  <div className="flex items-center justify-between">
+    <div>
+      <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+        spendster
+      </h1>
 
-        <p className="mt-2 text-sm text-gray-600 sm:text-base">
-          An Expense Tracker
-        </p>
-      </header>
+      <p className="mt-2 text-sm text-gray-600 sm:text-base">
+        An Expense Tracker
+      </p>
+    </div>
+
+    <button
+      onClick={() => signOut({ callbackUrl: "/login" })}
+      className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+    >
+      Logout
+    </button>
+  </div>
+
+  <p className="mt-4 text-sm text-gray-500">
+    Logged in as: {session?.user?.email}
+  </p>
+</header>
 
 
       <section className="mb-8 rounded-2xl border border-black bg-black p-6 text-white sm:p-8">
